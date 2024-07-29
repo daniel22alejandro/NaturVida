@@ -1,4 +1,4 @@
-// src/models/vendedors.js
+// src/models/vendedores.js
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
@@ -19,9 +19,13 @@ vendedoresSchema.pre("save", async function (next) {
     return next();
   }
 
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    return next(error);
+  }
 });
 
 let Vendedor;
@@ -33,4 +37,3 @@ try {
 }
 
 export default Vendedor;
-

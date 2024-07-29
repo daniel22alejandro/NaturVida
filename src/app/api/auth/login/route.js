@@ -2,29 +2,35 @@
 import { Conexion } from "@/lib/mongoDB";
 import Vendedores from "@/models/vendedores";
 import { generateToken } from "@/lib/jwt";
-import bcrypt from 'bcryptjs'; 
+import bcryptjs from 'bcryptjs'; 
 import { NextResponse } from "next/server";
 
 export async function POST(request) {
   try {
-    const { email, password } = await request.json();
+    const { usuario, password } = await request.json();
     await Conexion();
+    console.log("Conexión a la base de datos exitosa");
 
     // Verificar usuario
-    const user = await Vendedores.findOne({ email });
+    const user = await Vendedores.findOne({ usuario });
     if (!user) {
       return NextResponse.json({
         status: 401,
-        message: "Credenciales incorrectas",
+        message: "Usuario incorrecto",
       });
     }
+    console.log("Usuario encontrado:", user);
 
     // Comparar contraseñas
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
+    console.log("Contraseña ingresada:", password);
+    console.log("Contraseña almacenada:", user.password);
+    console.log("Coinciden:", isPasswordValid);
+
+    if (!isPasswordValid) {
       return NextResponse.json({
         status: 401,
-        message: "Credenciales incorrectas",
+        message: "Contraseña incorrecta",
       });
     }
 
